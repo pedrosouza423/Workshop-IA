@@ -6,6 +6,11 @@ export const queryKeys = createQueryKeyStore({
     detail: (id: string) => ({ queryKey: [id] }),
     list: (params?: { page?: number }) => ({ queryKey: [params] }),
   },
+  products: {
+    all: null,
+    detail: (id: string) => ({ queryKey: [id] }),
+    list: (params?: { page?: number }) => ({ queryKey: [params] }),
+  },
   profile: {
     all: null,
   },
