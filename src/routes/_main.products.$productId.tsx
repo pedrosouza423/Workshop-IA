@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useProduct } from "@features/products/hooks";
+import { useProduct, useUpdateProduct } from "@features/products/hooks";
+import { productDetailQueryOptions } from "@core/queries";
 import { ProductForm } from "@features/products/form";
 import type { ProductFormData } from "@features/products/schemas";
 import { Loading } from "@ui/loading";
@@ -15,9 +16,10 @@ function ProductDetailPage() {
   const { productId } = Route.useParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useProduct(productId);
+  const { mutateAsync: updateProduct } = useUpdateProduct(productId);
 
   const handleSubmit = async (next: ProductFormData) => {
-    console.log("[products] atualizar:", next);
+    await updateProduct(next);
     await navigate({ to: "/products" });
   };
 
