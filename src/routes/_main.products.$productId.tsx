@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { productDetailQueryOptions } from "@core/queries";
+import { useProduct } from "@features/products/hooks";
 import { ProductForm } from "@features/products/form";
 import type { ProductFormData } from "@features/products/schemas";
 import { Loading } from "@ui/loading";
@@ -15,7 +14,7 @@ export const Route = createFileRoute("/_main/products/$productId")({
 function ProductDetailPage() {
   const { productId } = Route.useParams();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useQuery(productDetailQueryOptions(productId));
+  const { data, isLoading, error } = useProduct(productId);
 
   const handleSubmit = async (next: ProductFormData) => {
     console.log("[products] atualizar:", next);
