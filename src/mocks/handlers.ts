@@ -1,4 +1,5 @@
 import { http, HttpResponse } from "msw";
+import type { ProductRecord } from "@core/queries";
 
 const mockItems = [
   { id: "1", title: "Documentação do projeto" },
@@ -70,5 +71,21 @@ export const handlers = [
       return HttpResponse.json({ message: "Product not found" }, { status: 404 });
     }
     return HttpResponse.json(product);
+  }),
+  http.post("/api/products", async ({ request }) => {
+    const body = (await request.json()) as Omit<ProductRecord, "id">;
+    const newProduct: ProductRecord = { ...body, id: String(mockProducts.length + 1) };
+    mockProducts.push(newProduct);
+    return HttpResponse.json(newProduct, { status: 201 });
+  }),
+  http.patch("/api/products/:id", async ({ params, request }) => {
+    const id = params["id"] as string;
+    const body = (await request.json()) as Partial<ProductRecord>;
+    const index = mockProducts.findIndex((p) => p.id === id);
+    if (index === -1) {
+      return HttpResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+    mockProducts[index] = { ...mockProducts[index], ...body };
+    return HttpResponse.json(mockProducts[index]);
   }),
 ];

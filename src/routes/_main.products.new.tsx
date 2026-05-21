@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useCreateProduct } from "@features/products/hooks";
 import { ProductForm } from "@features/products/form";
 import type { ProductFormData } from "@features/products/schemas";
 
@@ -8,9 +9,10 @@ export const Route = createFileRoute("/_main/products/new")({
 
 function ProductNewPage() {
   const navigate = useNavigate();
+  const { mutateAsync: createProduct } = useCreateProduct();
 
   const handleSubmit = async (data: ProductFormData) => {
-    console.log("[products] criar:", data);
+    await createProduct(data);
     await navigate({ to: "/products" });
   };
 
