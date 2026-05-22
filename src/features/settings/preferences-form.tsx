@@ -37,7 +37,7 @@ export function PreferencesForm({ defaultValues, onSubmit }: PreferencesFormProp
         label="Tema"
         render={({ value, onChange }) => (
           <SegmentedControl
-            value={(value || "light") as "light" | "dark"}
+            value={value ?? "light"}
             onChange={onChange}
             options={[
               { value: "light", label: "Light" },
