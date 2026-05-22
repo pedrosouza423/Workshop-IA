@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductsList } from "@features/products/list";
+import { buttonVariants } from "@ui/button.variants";
 
 export const Route = createFileRoute("/_main/products/")({
   component: ProductsListPage,
@@ -13,10 +14,7 @@ function ProductsListPage() {
           <h1 className="text-2xl font-bold text-app-foreground">Produtos</h1>
           <p className="text-app-muted mt-1">Catálogo de produtos da aplicação.</p>
         </div>
-        <Link
-          to="/products/new"
-          className="inline-flex items-center rounded-md bg-app-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-app-primary-hover"
-        >
+        <Link to="/products/new" className={buttonVariants({ variant: "primary" })}>
           Novo produto
         </Link>
       </div>

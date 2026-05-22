@@ -31,7 +31,7 @@ export function ProductsList() {
   const { data, isLoading, error } = useProductsList();
   const [editingProduct, setEditingProduct] = useState<ProductRecord | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<ProductRecord | null>(null);
-  const { mutateAsync: updateProduct } = useUpdateProduct(editingProduct?.id ?? "");
+  const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct(editingProduct?.id ?? "");
   const { mutateAsync: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
   const handleUpdate = async (formData: ProductFormData) => {
@@ -158,7 +158,7 @@ export function ProductsList() {
 
       <DialogRoot
         open={!!editingProduct}
-        onOpenChange={(open) => { if (!open) setEditingProduct(null); }}
+        onOpenChange={(open) => { if (!open && !isUpdating) setEditingProduct(null); }}
       >
         <DialogPortal>
           <DialogBackdrop />
@@ -185,7 +185,7 @@ export function ProductsList() {
 
       <DialogRoot
         open={!!deletingProduct}
-        onOpenChange={(open) => { if (!open) setDeletingProduct(null); }}
+        onOpenChange={(open) => { if (!open && !isDeleting) setDeletingProduct(null); }}
       >
         <DialogPortal>
           <DialogBackdrop />
