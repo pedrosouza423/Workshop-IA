@@ -17,6 +17,7 @@ export function SegmentedControl<T extends string>({
         <button
           key={option.value}
           type="button"
+          aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
           className={[
             "px-4 py-2 text-sm font-medium transition-colors",

@@ -12,10 +12,9 @@ function SettingsPage() {
   const setTheme = useAppStore((s) => s.setTheme);
 
   const handleSubmit = (data: PreferencesFormData) => {
-    if (data.theme) {
-      setTheme(data.theme);
-      document.documentElement.setAttribute("data-theme", data.theme);
-    }
+    const theme = data.theme ?? "light";
+    setTheme(theme);
+    document.documentElement.setAttribute("data-theme", theme);
   };
 
   return (

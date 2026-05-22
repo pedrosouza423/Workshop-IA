@@ -25,4 +25,10 @@ describe("ui/SegmentedControl", () => {
     expect(onChange).toHaveBeenCalledOnce();
     expect(onChange).toHaveBeenCalledWith("dark");
   });
+
+  it("marks the selected option as pressed", () => {
+    render(<SegmentedControl value="dark" onChange={vi.fn()} options={OPTIONS} />);
+    expect(screen.getByRole("button", { name: "Dark" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Light" })).toHaveAttribute("aria-pressed", "false");
+  });
 });
