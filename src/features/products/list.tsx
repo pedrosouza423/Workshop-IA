@@ -31,18 +31,30 @@ export function ProductsList() {
   const { data, isLoading, error } = useProductsList();
   const [editingProduct, setEditingProduct] = useState<ProductRecord | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<ProductRecord | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct(editingProduct?.id ?? "");
   const { mutateAsync: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
   const handleUpdate = async (formData: ProductFormData) => {
-    await updateProduct(formData);
-    setEditingProduct(null);
+    setUpdateError(null);
+    try {
+      await updateProduct(formData);
+      setEditingProduct(null);
+    } catch {
+      setUpdateError("Falha ao atualizar o produto. Tente novamente.");
+    }
   };
 
   const handleDelete = async () => {
     if (!deletingProduct) return;
-    await deleteProduct(deletingProduct.id);
-    setDeletingProduct(null);
+    setDeleteError(null);
+    try {
+      await deleteProduct(deletingProduct.id);
+      setDeletingProduct(null);
+    } catch {
+      setDeleteError("Falha ao excluir o produto. Tente novamente.");
+    }
   };
 
   const columns = useMemo<ColumnDef<ProductRecord>[]>(
@@ -172,6 +184,9 @@ export function ProductsList() {
             <DialogDescription className="mb-6">
               Atualize os dados do produto (ID: {editingProduct?.id}).
             </DialogDescription>
+            {updateError && (
+              <p className="mb-4 text-sm text-red-600">{updateError}</p>
+            )}
             {editingProduct && (
               <ProductForm
                 defaultValues={editingProduct}
@@ -199,12 +214,15 @@ export function ProductsList() {
             <DialogDescription className="mb-6">
               Tem certeza que deseja excluir <strong>{deletingProduct?.name}</strong>? Esta ação não pode ser desfeita.
             </DialogDescription>
+            {deleteError && (
+              <p className="mb-4 text-sm text-red-600">{deleteError}</p>
+            )}
             <div className="flex gap-2">
               <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
                 {isDeleting ? "Excluindo…" : "Excluir"}
               </Button>
-              <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
+              <DialogClose render={<Button variant="outline" />}>
+                Cancelar
               </DialogClose>
             </div>
           </DialogPanel>
