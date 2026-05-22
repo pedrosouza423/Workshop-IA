@@ -1,15 +1,26 @@
-import { useMemo } from "react";
-import { Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { useProductsList } from "@features/products/hooks";
+import { useProductsList, useUpdateProduct, useDeleteProduct } from "@features/products/hooks";
+import { ProductForm } from "@features/products/form";
 import type { ProductRecord } from "@core/queries";
+import type { ProductFormData } from "@features/products/schemas";
 import { Loading } from "@ui/loading";
 import { Badge } from "@ui/badge";
+import { Button } from "@ui/button";
+import {
+  DialogRoot,
+  DialogPortal,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@ui/dialog";
 
 const priceFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -18,6 +29,21 @@ const priceFormatter = new Intl.NumberFormat("pt-BR", {
 
 export function ProductsList() {
   const { data, isLoading, error } = useProductsList();
+  const [editingProduct, setEditingProduct] = useState<ProductRecord | null>(null);
+  const [deletingProduct, setDeletingProduct] = useState<ProductRecord | null>(null);
+  const { mutateAsync: updateProduct } = useUpdateProduct(editingProduct?.id ?? "");
+  const { mutateAsync: deleteProduct, isPending: isDeleting } = useDeleteProduct();
+
+  const handleUpdate = async (formData: ProductFormData) => {
+    await updateProduct(formData);
+    setEditingProduct(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingProduct) return;
+    await deleteProduct(deletingProduct.id);
+    setDeletingProduct(null);
+  };
 
   const columns = useMemo<ColumnDef<ProductRecord>[]>(
     () => [
@@ -62,13 +88,22 @@ export function ProductsList() {
         id: "action",
         header: "",
         cell: ({ row }) => (
-          <Link
-            to="/products/$productId"
-            params={{ productId: row.original.id }}
-            className="text-sm text-app-primary hover:underline"
-          >
-            Editar
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setEditingProduct(row.original)}
+              className="text-sm text-app-primary hover:underline"
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeletingProduct(row.original)}
+              className="text-sm text-red-500 hover:underline"
+            >
+              Excluir
+            </button>
+          </div>
         ),
       },
     ],
@@ -87,37 +122,94 @@ export function ProductsList() {
   if (!data?.length) return <p className="text-app-muted py-4">Nenhum produto cadastrado.</p>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b border-app-border">
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  scope="col"
-                  className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-app-muted"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="border-b border-app-border last:border-0">
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3 align-middle">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="border-b border-app-border">
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    scope="col"
+                    className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-app-muted"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="border-b border-app-border last:border-0">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-3 align-middle">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <DialogRoot
+        open={!!editingProduct}
+        onOpenChange={(open) => { if (!open) setEditingProduct(null); }}
+      >
+        <DialogPortal>
+          <DialogBackdrop />
+          <DialogPanel>
+            <div className="flex items-start justify-between mb-1">
+              <DialogTitle>Editar produto</DialogTitle>
+              <DialogClose className="text-app-muted hover:text-app-foreground text-lg leading-none -mt-1">
+                ✕
+              </DialogClose>
+            </div>
+            <DialogDescription className="mb-6">
+              Atualize os dados do produto (ID: {editingProduct?.id}).
+            </DialogDescription>
+            {editingProduct && (
+              <ProductForm
+                defaultValues={editingProduct}
+                onSubmit={handleUpdate}
+                submitLabel="Atualizar"
+              />
+            )}
+          </DialogPanel>
+        </DialogPortal>
+      </DialogRoot>
+
+      <DialogRoot
+        open={!!deletingProduct}
+        onOpenChange={(open) => { if (!open) setDeletingProduct(null); }}
+      >
+        <DialogPortal>
+          <DialogBackdrop />
+          <DialogPanel className="max-w-sm">
+            <div className="flex items-start justify-between mb-1">
+              <DialogTitle>Excluir produto</DialogTitle>
+              <DialogClose className="text-app-muted hover:text-app-foreground text-lg leading-none -mt-1">
+                ✕
+              </DialogClose>
+            </div>
+            <DialogDescription className="mb-6">
+              Tem certeza que deseja excluir <strong>{deletingProduct?.name}</strong>? Esta ação não pode ser desfeita.
+            </DialogDescription>
+            <div className="flex gap-2">
+              <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? "Excluindo…" : "Excluir"}
+              </Button>
+              <DialogClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DialogClose>
+            </div>
+          </DialogPanel>
+        </DialogPortal>
+      </DialogRoot>
+    </>
   );
 }
