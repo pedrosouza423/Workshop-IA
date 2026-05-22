@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { Header } from "@ui/header";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useAppStore } from "@core/app-store";
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -32,6 +34,11 @@ function NavLink({ to, label }: { to: string; label: string }) {
 }
 
 export function MainLayout({ children, appVersion }: MainLayoutProps) {
+  useEffect(() => {
+    const theme = useAppStore.getState().theme;
+    document.documentElement.setAttribute("data-theme", theme);
+  }, []);
+
   return (
     <div data-slot="main-layout" className="min-h-screen flex flex-col bg-app-bg">
       <Header className="flex items-center justify-between px-6 h-14 border-app-border bg-app-surface shadow-sm">
