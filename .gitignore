@@ -11,3 +11,4 @@ coverage
 *.tsbuildinfo
 src/routeTree.gen.ts
 .repo/
+.claude/settings.local.json

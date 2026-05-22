@@ -4,7 +4,7 @@ import { buttonVariants } from "@ui/button.variants";
 import type { ComponentProps } from "react";
 
 type ButtonProps = ComponentProps<typeof BaseButton> & {
-  variant?: "default" | "primary" | "secondary" | "outline" | "ghost";
+  variant?: "default" | "primary" | "secondary" | "outline" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
 };
 

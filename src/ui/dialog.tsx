@@ -10,6 +10,10 @@ export function DialogTrigger(props: ComponentProps<typeof Dialog.Trigger>) {
   return <Dialog.Trigger {...props} />;
 }
 
+export function DialogPortal(props: ComponentProps<typeof Dialog.Portal>) {
+  return <Dialog.Portal {...props} />;
+}
+
 export function DialogBackdrop({
   className,
   ...props
@@ -32,7 +36,7 @@ export function DialogPanel({
   return (
     <Dialog.Popup
       className={cx(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-neutral-200 bg-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-lg duration-200 max-h-[calc(100vh-4rem)] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         typeof className === "string" ? className : ""
       )}
       {...props}
@@ -50,4 +54,8 @@ export function DialogDescription(
   return (
     <Dialog.Description className="text-sm text-neutral-500" {...props} />
   );
+}
+
+export function DialogClose(props: ComponentProps<typeof Dialog.Close>) {
+  return <Dialog.Close {...props} />;
 }

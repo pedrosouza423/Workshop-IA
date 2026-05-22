@@ -35,3 +35,13 @@ export function useUpdateProduct(id: string) {
     },
   });
 }
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => httpResource<undefined>("DELETE", `/products/${id}`)(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.list().queryKey });
+    },
+  });
+}

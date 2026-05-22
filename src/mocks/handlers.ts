@@ -88,4 +88,13 @@ export const handlers = [
     mockProducts[index] = { ...mockProducts[index], ...body };
     return HttpResponse.json(mockProducts[index]);
   }),
+  http.delete("/api/products/:id", ({ params }) => {
+    const id = params["id"] as string;
+    const index = mockProducts.findIndex((p) => p.id === id);
+    if (index === -1) {
+      return HttpResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+    mockProducts.splice(index, 1);
+    return new HttpResponse(null, { status: 204 });
+  }),
 ];
