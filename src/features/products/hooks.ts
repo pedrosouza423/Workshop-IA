@@ -35,3 +35,16 @@ export function useUpdateProduct(id: string) {
     },
   });
 }
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/products/${id}`, { method: "DELETE" }).then((res) => {
+        if (!res.ok) throw new Error("Failed to delete product");
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.list().queryKey });
+    },
+  });
+}
