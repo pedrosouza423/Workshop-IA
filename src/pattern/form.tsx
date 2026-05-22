@@ -2,24 +2,24 @@ import type { ReactFormExtendedApi } from "@tanstack/react-form";
 import { FormField, FormLabel, FormError, FormControl } from "@ui/form";
 import { Input } from "@ui/input";
 
-type FormFieldWrapperProps<TFormData> = {
+type FormFieldWrapperProps<TFormData, TName extends Extract<keyof TFormData, string>> = {
   form: ReactFormExtendedApi<TFormData>;
-  name: Extract<keyof TFormData, string>;
+  name: TName;
   label: string;
   render?: (props: {
-    value: string;
-    onChange: (v: string) => void;
+    value: TFormData[TName];
+    onChange: (v: TFormData[TName]) => void;
     onBlur: () => void;
     error: string | undefined;
   }) => React.ReactNode;
 };
 
-export function FormFieldWrapper<TFormData>({
+export function FormFieldWrapper<TFormData, TName extends Extract<keyof TFormData, string>>({
   form,
   name,
   label,
   render,
-}: FormFieldWrapperProps<TFormData>) {
+}: FormFieldWrapperProps<TFormData, TName>) {
   return (
     <form.Field name={name as never}>
       {(field) => {
@@ -31,7 +31,7 @@ export function FormFieldWrapper<TFormData>({
             <FormControl>
               {render
                 ? render({
-                    value: String(field.state.value ?? ""),
+                    value: field.state.value as TFormData[TName],
                     onChange: (v) => field.handleChange(v as never),
                     onBlur: field.handleBlur,
                     error,
