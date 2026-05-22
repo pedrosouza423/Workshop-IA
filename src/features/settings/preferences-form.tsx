@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { FormFieldWrapper } from "@pattern/form";
 import { Button } from "@ui/button";
+import { SegmentedControl } from "@ui/segmented-control";
 import { createFormSubmitHandler } from "@pattern/form.hooks";
 import { preferencesSchema } from "@features/settings/schemas";
 import type { PreferencesFormData } from "@features/settings/schemas";
@@ -30,7 +31,21 @@ export function PreferencesForm({ defaultValues, onSubmit }: PreferencesFormProp
       }}
       className="space-y-4"
     >
-      <FormFieldWrapper form={form} name="theme" label="Tema" />
+      <FormFieldWrapper
+        form={form}
+        name="theme"
+        label="Tema"
+        render={({ value, onChange }) => (
+          <SegmentedControl
+            value={(value || "light") as "light" | "dark"}
+            onChange={onChange}
+            options={[
+              { value: "light", label: "Light" },
+              { value: "dark",  label: "Dark"  },
+            ]}
+          />
+        )}
+      />
       <form.Field name="notifications">
         {(field) => (
           <label className="flex items-center gap-2 text-app-foreground">
